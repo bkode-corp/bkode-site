@@ -1,0 +1,112 @@
+---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from 'astro:env/server';
+import Row from '@/components/Row.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import Arrow from '@/components/Arrow.astro';
+import ContactForm from '@/components/react/ContactForm';
+import { segments, type LeadSegment } from '@/data/segments';
+import { contactEmail, mailtoHref, whatsappHref } from '@/lib/contact';
+
+interface Props {
+  index?: string;
+  defaultSegment?: LeadSegment;
+  title?: string;
+  lede?: string;
+}
+
+const {
+  index = '04',
+  defaultSegment,
+  title = 'Conte o problema. A resposta vem de quem vai construir.',
+  lede = 'Sem formulário de orçamento com vinte campos. Diga o que trava a sua rotina e a gente responde com perguntas, um caminho e um prazo.',
+} = Astro.props;
+
+const options = segments.map((segment) => ({ value: segment.leadValue, label: segment.persona }));
+const whatsapp = whatsappHref('Olá! Vim pelo site da BKode e quero conversar sobre um projeto.');
+const email = mailtoHref('Projeto pelo site da BKode');
+
+// Resolved at build time: the static page only ships the form when /api/lead can store leads.
+const formEnabled = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
+const nextSteps = [
+  'Você recebe a resposta pelo canal que escolheu.',
+  'Uma conversa curta para entender como o trabalho acontece hoje.',
+  'Escopo, prazo e valor por escrito antes de começar.',
+];
+---
+
+<Row id="contato" aria-labelledby="contato-titulo">
+  <SectionHead index={index} label="contato" title={title} titleId="contato-titulo" lede={lede} />
+  <div class="cells lg:grid-cols-2">
+    <div class="flex flex-col justify-between gap-10 px-6 py-10 sm:px-10 sm:py-12">
+      <ul class="grid gap-px overflow-hidden rounded-xl border border-line bg-line">
+        {
+          whatsapp && (
+            <li>
+              <a href={whatsapp} target="_blank" rel="noopener" class="group flex items-center justify-between gap-4 bg-ink px-5 py-4 transition-colors hover:bg-coal">
+                <span>
+                  <span class="label block">whatsapp</span>
+                  <span class="mt-1 block text-paper">Conversar agora</span>
+                </span>
+                <span class="link-arrow"><Arrow direction="up-right" /></span>
+              </a>
+            </li>
+          )
+        }
+        <li>
+          <a href={email} class="group flex items-center justify-between gap-4 bg-ink px-5 py-4 transition-colors hover:bg-coal">
+            <span class="min-w-0">
+              <span class="label block">e-mail</span>
+              <span class="mt-1 block break-all text-paper">{contactEmail}</span>
+            </span>
+            <span class="link-arrow"><Arrow direction="up-right" /></span>
+          </a>
+        </li>
+      </ul>
+
+      <div>
+        <p class="label mb-4">o que acontece depois</p>
+        <ol class="space-y-3">
+          {
+            nextSteps.map((step, i) => (
+              <li class="grid grid-cols-[2rem_minmax(0,1fr)] text-bone">
+                <span class="font-mono text-sm text-ash">{String(i + 1).padStart(2, '0')}</span>
+                <span>{step}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </div>
+
+    {
+      formEnabled ? (
+        <ContactForm
+          client:visible
+          segments={options}
+          defaultSegment={defaultSegment}
+          whatsappHref={whatsapp}
+          turnstileSiteKey={PUBLIC_TURNSTILE_SITE_KEY}
+        />
+      ) : (
+        <div class="flex flex-col justify-center gap-5 px-6 py-10 sm:px-10 sm:py-12">
+          <p class="type-heading text-paper">Fale direto com quem vai construir.</p>
+          <p class="max-w-md text-ash">
+            Mande uma mensagem contando o problema do seu jeito, sem termo técnico. Respondemos pelo mesmo canal.
+          </p>
+          <div class="mt-2 flex flex-wrap gap-3">
+            {whatsapp && (
+              <a href={whatsapp} target="_blank" rel="noopener" class="btn btn-solid">
+                Conversar no WhatsApp
+              </a>
+            )}
+            <a href={email} class:list={['btn', whatsapp ? 'btn-ghost' : 'btn-solid']}>
+              Enviar e-mail
+            </a>
+          </div>
+        </div>
+      )
+    }
+  </div>
+</Row>

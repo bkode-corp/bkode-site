@@ -1,0 +1,137 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import Logo from '@/components/Logo.astro';
+import { LOGO_FILES, PALETTE, WORDMARK_CHEVRON } from '@/lib/brand';
+
+const variants = [
+  { id: 'simbolo', name: 'Símbolo', use: 'Avatar, favicon, ícone de app, redes.', min: '16 px · 6 mm', box: 'h-20 w-20' },
+  {
+    id: 'horizontal',
+    name: 'Horizontal',
+    use: 'Versão principal: site, documentos, propostas, assinatura de e-mail.',
+    min: '120 px · 30 mm de largura',
+    box: 'h-auto w-[80%]',
+  },
+  { id: 'vertical', name: 'Vertical', use: 'Espaços quadrados: capa, splash, perfil.', min: '72 px · 20 mm de largura', box: 'h-24 w-auto' },
+] as const;
+
+const filesFor = (variant: string) => LOGO_FILES.filter((f) => f.variant === variant);
+
+const rules = [
+  { title: 'Só preto ou branco', body: 'O logo usa #09090B sobre fundos claros e #FAFAFA sobre fundos escuros. Nunca cor, gradiente, sombra ou contorno.' },
+  { title: 'Área de respiro', body: 'Deixe livre metade da altura do símbolo em volta do logo, e um quarto em volta do símbolo sozinho.' },
+  { title: 'Sólido ou vazado', body: 'Sólido preenche o K com a cor oposta e funciona sobre qualquer fundo. Vazado deixa o fundo aparecer pelo K.' },
+  { title: 'Não redesenhe', body: 'O logotipo é um desenho geométrico próprio, não uma fonte. Use sempre os arquivos desta página.' },
+] as const;
+---
+
+<BaseLayout
+  title="Marca"
+  description="Logo, cores e regras de uso da marca BKode, com os arquivos em SVG para download."
+  ogImage="/og/marca.png"
+>
+  <div class="frame">
+    <Row aria-labelledby="marca-titulo" crosses={false}>
+      <div class="cells md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div class="px-6 pt-12 pb-14 sm:px-10 sm:pt-16 sm:pb-20">
+          <p class="label">marca</p>
+          <h1 id="marca-titulo" class="type-display type-display-sm construct -mx-6 mt-10 px-6 text-paper sm:-mx-10 sm:px-10">
+            Um K que também é código.
+          </h1>
+          <p class="type-lede mt-8 max-w-xl">
+            O K da BKode é um traço vertical seguido de um sinal de menor-que. Aqui estão as versões do logo, as cores e
+            as regras de uso, com os arquivos prontos para baixar.
+          </p>
+        </div>
+        <div class="grid-dots flex items-center justify-center px-6 py-12 sm:px-10">
+          <div class="flex items-center gap-5 text-paper" aria-label="Traço mais menor-que é igual a K" role="img">
+            <svg viewBox="82 0 16 100" class="h-20 w-auto" aria-hidden="true"><path d="M90 0V100" stroke="currentColor" stroke-width="16" /></svg>
+            <span class="font-mono text-2xl text-ash" aria-hidden="true">+</span>
+            <svg viewBox="110 0 53.35 100" class="h-20 w-auto text-ash" aria-hidden="true"><polygon points={WORDMARK_CHEVRON} fill="currentColor" /></svg>
+            <span class="font-mono text-2xl text-ash" aria-hidden="true">=</span>
+            <svg viewBox="82 0 82 100" class="h-20 w-auto" aria-hidden="true">
+              <path d="M90 0V100" stroke="currentColor" stroke-width="16" />
+              <polygon points={WORDMARK_CHEVRON} fill="currentColor" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </Row>
+
+    <Row aria-labelledby="versoes-titulo">
+      <SectionHead
+        index="01"
+        label="versões"
+        title="Três versões, duas cores, dois acabamentos."
+        titleId="versoes-titulo"
+        lede="Baixe em SVG. Branco para fundos escuros, preto para fundos claros."
+      />
+      <ul class="cells lg:grid-cols-3">
+        {
+          variants.map((variant) => (
+            <li class="flex flex-col">
+              <div class="grid grid-cols-2 border-b border-line">
+                <div class="flex h-48 items-center justify-center bg-ink text-paper">
+                  <Logo variant={variant.id} title={`${variant.name}, branco`} class={variant.box} />
+                </div>
+                <div class="flex h-48 items-center justify-center bg-paper text-ink">
+                  <Logo variant={variant.id} title={`${variant.name}, preto`} class={variant.box} />
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col px-6 py-8 sm:px-8">
+                <h3 class="type-heading text-paper">{variant.name}</h3>
+                <p class="mt-2 text-ash">{variant.use}</p>
+                <p class="label mt-4">mínimo: {variant.min}</p>
+                <ul class="mt-6 grid grid-cols-2 gap-1.5">
+                  {filesFor(variant.id).map((file) => (
+                    <li>
+                      <a href={`/brand/${file.file}`} download class="chip w-full justify-between gap-2 py-1 hover:border-edge hover:text-paper">
+                        {file.tone} · {file.finish === 'solido' ? 'sólido' : 'vazado'}
+                        <span aria-hidden="true">↓</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </Row>
+
+    <Row aria-labelledby="cores-titulo">
+      <SectionHead index="02" label="cores" title="Estritamente monocromática." titleId="cores-titulo" lede="A escala Zinc: sem acento de cor em nenhum ponto da marca." />
+      <ul class="cells grid-cols-2 lg:grid-cols-4">
+        {
+          PALETTE.map((color) => (
+            <li class="flex flex-col">
+              <div class="h-32 border-b border-line" style={`background:${color.hex}`} />
+              <div class="px-6 py-6 sm:px-8">
+                <p class="font-mono text-sm text-paper">{color.hex}</p>
+                <p class="mt-1 text-sm text-bone">{color.name}</p>
+                <p class="mt-2 text-sm text-ash">{color.role}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </Row>
+
+    <Row aria-labelledby="regras-titulo">
+      <SectionHead index="03" label="regras" title="Regras de uso." titleId="regras-titulo" />
+      <ul class="cells md:grid-cols-2">
+        {
+          rules.map((rule, i) => (
+            <li class="px-6 py-10 sm:px-10">
+              <p class="font-mono text-sm text-ash">{String(i + 1).padStart(2, '0')}</p>
+              <h3 class="type-heading mt-6 text-paper">{rule.title}</h3>
+              <p class="mt-3 max-w-md text-ash">{rule.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Row>
+  </div>
+</BaseLayout>

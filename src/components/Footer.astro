@@ -1,0 +1,109 @@
+---
+import Row from '@/components/Row.astro';
+import { HORIZONTAL, SYMBOL_PATH, WORDMARK_CHEVRON, WORDMARK_CIRCLES, WORDMARK_STROKES } from '@/lib/brand';
+import { nav, site } from '@/data/site';
+import { segments } from '@/data/segments';
+import { contactEmail, whatsappHref } from '@/lib/contact';
+
+const whatsapp = whatsappHref('Olá! Vim pelo site da BKode.');
+const year = new Date().getFullYear();
+
+/** Guides from the construction sheet, in lockup units (wordmark sits 22 u below the symbol top). */
+const guides = [
+  { y: HORIZONTAL.wordmarkY, label: 'caixa-alta' },
+  { y: HORIZONTAL.wordmarkY + 30, label: 'x-height' },
+  { y: HORIZONTAL.wordmarkY + 100, label: 'base' },
+];
+const pad = 72; // clear space: ½ of the symbol height
+const vbWidth = HORIZONTAL.width + pad * 2 + 90;
+const vbHeight = HORIZONTAL.height + pad;
+---
+
+<footer class="mt-auto">
+  <div class="frame">
+    <Row as="div">
+      <div class="cells md:grid-cols-4">
+        <div class="px-6 py-10 sm:px-10 md:col-span-2">
+          <p class="type-heading text-paper">{site.tagline}</p>
+          <p class="mt-4 max-w-sm text-ash">{site.description}</p>
+        </div>
+        <nav aria-label="Rodapé" class="px-6 py-10 sm:px-10">
+          <p class="label mb-4">navegação</p>
+          <ul class="space-y-2.5">
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} class="text-bone transition-colors hover:text-paper">
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+        <div class="px-6 py-10 sm:px-10">
+          <p class="label mb-4">contato</p>
+          <ul class="space-y-2.5">
+            {
+              whatsapp && (
+                <li>
+                  <a href={whatsapp} target="_blank" rel="noopener" class="text-bone hover:text-paper">
+                    WhatsApp
+                  </a>
+                </li>
+              )
+            }
+            <li>
+              <a href={`mailto:${contactEmail}`} class="break-all text-bone hover:text-paper">{contactEmail}</a>
+            </li>
+            <li>
+              <a href={site.githubUrl} target="_blank" rel="noopener" class="text-bone hover:text-paper">GitHub</a>
+            </li>
+            <li class="text-ash">{site.city}, {site.region}</li>
+          </ul>
+        </div>
+      </div>
+    </Row>
+
+    <Row as="div">
+      <p class="label border-b border-line px-6 py-3 sm:px-10">construção · traço 16 u · caixa-alta 100 u</p>
+      <div class="px-2 py-8 sm:px-6 sm:py-12">
+        <svg viewBox={`${-pad} ${-pad / 2} ${vbWidth} ${vbHeight}`} class="block w-full text-paper" role="img" aria-label="Logo da BKode sobre as linhas de construção">
+          <g stroke="currentColor" stroke-width="1" vector-effect="non-scaling-stroke" class="text-line">
+            {guides.map((guide) => <line x1={-pad} x2={vbWidth - pad} y1={guide.y} y2={guide.y} vector-effect="non-scaling-stroke" />)}
+            <line x1="0" x2="0" y1={-pad / 2} y2={vbHeight - pad / 2} vector-effect="non-scaling-stroke" />
+            <line x1="144" x2="144" y1={-pad / 2} y2={vbHeight - pad / 2} vector-effect="non-scaling-stroke" />
+            <line x1={HORIZONTAL.wordmarkX} x2={HORIZONTAL.wordmarkX} y1={-pad / 2} y2={vbHeight - pad / 2} vector-effect="non-scaling-stroke" />
+          </g>
+          <g class="hidden fill-ash sm:block" font-family="var(--font-mono)" font-size="9">
+            {guides.map((guide) => <text x={HORIZONTAL.width + 14} y={guide.y - 4}>{guide.label}</text>)}
+          </g>
+          <path d={SYMBOL_PATH} fill="currentColor" fill-rule="evenodd" />
+          <g transform={`translate(${HORIZONTAL.wordmarkX} ${HORIZONTAL.wordmarkY})`}>
+            <g fill="none" stroke="currentColor" stroke-width="16">
+              {WORDMARK_STROKES.map((d) => <path d={d} />)}
+              {WORDMARK_CIRCLES.map((c) => <circle cx={c.cx} cy={c.cy} r={c.r} />)}
+            </g>
+            <polygon points={WORDMARK_CHEVRON} fill="currentColor" />
+          </g>
+        </svg>
+      </div>
+    </Row>
+
+    <div class="flex flex-col gap-3 px-6 py-6 text-sm text-ash sm:flex-row sm:items-center sm:justify-between sm:px-10">
+      <p>© {year} {site.name} · {site.city}, {site.region}</p>
+      <ul class="flex flex-wrap gap-x-5 gap-y-2">
+        {
+          segments.map((segment) => (
+            <li>
+              <a href={`/${segment.slug}`} class="hover:text-paper">
+                {segment.label}
+              </a>
+            </li>
+          ))
+        }
+        <li><a href="/llms.txt" class="font-mono text-xs hover:text-paper">llms.txt</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>

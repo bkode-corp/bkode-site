@@ -1,0 +1,47 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import CaseGrid from '@/components/CaseGrid.astro';
+import ContactSection from '@/components/ContactSection.astro';
+import { cases } from '@/data/cases';
+
+const inProduction = cases.filter((item) => item.status === 'Em produção').length;
+---
+
+<BaseLayout
+  title="Cases"
+  description="Sistemas que a BKode já construiu: atendimento com IA, gestão financeira, agendamento com pagamento, orçamentos em PDF e gestão de studio."
+  ogImage="/og/cases.png"
+>
+  <div class="frame">
+    <Row aria-labelledby="cases-titulo" crosses={false}>
+      <div class="cells md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div class="px-6 pt-12 pb-14 sm:px-10 sm:pt-16 sm:pb-20">
+          <p class="label">cases</p>
+          <h1 id="cases-titulo" class="type-display type-display-sm construct -mx-6 mt-10 px-6 text-paper sm:-mx-10 sm:px-10">
+            Projetos que já construímos.
+          </h1>
+          <p class="type-lede mt-8 max-w-xl">
+            Cada case mostra o problema que existia, o que foi construído e as decisões técnicas por trás.
+          </p>
+        </div>
+        <dl class="grid-dots flex flex-col justify-end gap-6 px-6 py-10 sm:px-10">
+          <div>
+            <dt class="label">cases documentados</dt>
+            <dd class="mt-1 text-5xl font-semibold tracking-tight text-paper">{String(cases.length).padStart(2, '0')}</dd>
+          </div>
+          <div>
+            <dt class="label">em produção</dt>
+            <dd class="mt-1 text-5xl font-semibold tracking-tight text-paper">{String(inProduction).padStart(2, '0')}</dd>
+          </div>
+        </dl>
+      </div>
+    </Row>
+
+    <Row aria-label="Lista de cases">
+      <CaseGrid items={cases} cta={{ href: '#contato', title: 'O próximo case pode ser o seu sistema.', label: 'Contar meu problema' }} />
+    </Row>
+
+    <ContactSection index="01" />
+  </div>
+</BaseLayout>

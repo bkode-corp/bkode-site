@@ -1,0 +1,70 @@
+---
+import Logo from '@/components/Logo.astro';
+import { nav } from '@/data/site';
+import { primaryContactHref, primaryIsExternal } from '@/lib/contact';
+
+const cta = primaryContactHref('Olá! Vim pelo site da BKode e quero conversar sobre um projeto.');
+const external = primaryIsExternal ? { target: '_blank', rel: 'noopener' } : {};
+const current = Astro.url.pathname;
+const isCurrent = (href: string) => !href.includes('#') && (current === href || current.startsWith(`${href}/`));
+---
+
+<header class="sticky top-0 z-40 border-b border-line bg-ink/85 backdrop-blur-md supports-[backdrop-filter]:bg-ink/70">
+  <div class="frame flex h-16 items-center justify-between gap-4 px-4 sm:px-6">
+    <a href="/" class="shrink-0 text-paper" aria-label="BKode, página inicial">
+      <Logo variant="horizontal" title="" class="h-8 w-auto" />
+    </a>
+
+    <nav aria-label="Principal" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class="rounded-md px-3 py-2 text-[0.9375rem] text-ash transition-colors hover:text-paper aria-[current=page]:text-paper"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      <a href={cta} class="btn btn-solid min-h-9 px-4 text-sm" {...external}>Fale com a gente</a>
+
+      <details class="group relative md:hidden">
+        <summary
+          class="flex size-9 cursor-pointer list-none items-center justify-center rounded-md border border-edge text-paper [&::-webkit-details-marker]:hidden"
+          aria-label="Abrir menu"
+        >
+          <svg viewBox="0 0 16 16" class="size-4 group-open:hidden" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M2 5h12M2 11h12" />
+          </svg>
+          <svg viewBox="0 0 16 16" class="hidden size-4 group-open:block" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="m3.5 3.5 9 9M12.5 3.5l-9 9" />
+          </svg>
+        </summary>
+        <nav aria-label="Menu" class="absolute right-0 top-12 w-56 rounded-xl border border-line bg-coal p-2">
+          <ul>
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href} class="block rounded-lg px-3 py-2.5 text-paper hover:bg-ink">
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
+            <li>
+              <a href="/#contato" class="block rounded-lg px-3 py-2.5 text-paper hover:bg-ink">Contato</a>
+            </li>
+          </ul>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>

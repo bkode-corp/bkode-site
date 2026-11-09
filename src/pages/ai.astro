@@ -1,0 +1,30 @@
+---
+import { buildLlmsTxt } from '@/lib/machine-index';
+import { contactEmail, whatsappNumber } from '@/lib/contact';
+
+const origin = Astro.site?.href ?? 'http://localhost:4321';
+const text = buildLlmsTxt(origin, { email: contactEmail, whatsapp: whatsappNumber });
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BKode :: índice em texto puro</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={new URL('/', origin).href} />
+    <style>
+      body { margin: 0; background: #09090b; color: #e4e4e7; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      main { max-width: 80ch; margin: 0 auto; padding: 32px 16px 64px; }
+      pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+      a { color: #fafafa; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p># versão em texto puro de <a href="/">BKode</a>, para agentes de IA e quem prefere assim. Também em <a href="/llms.txt">/llms.txt</a>.</p>
+      <pre>{text}</pre>
+    </main>
+  </body>
+</html>

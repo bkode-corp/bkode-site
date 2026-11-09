@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import { segments } from '@/data/segments';
+---
+
+<BaseLayout title="Página não encontrada" noindex>
+  <div class="frame">
+    <Row aria-labelledby="erro-titulo" crosses={false}>
+      <div class="cells md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div class="px-6 py-16 sm:px-10 sm:py-24">
+          <p class="label">status: 404</p>
+          <h1 id="erro-titulo" class="type-display type-display-sm construct -mx-6 mt-10 px-6 text-paper sm:-mx-10 sm:px-10">
+            Essa rota não existe.
+          </h1>
+          <p class="type-lede mt-8 max-w-md">O endereço pode ter mudado. Comece pela página inicial ou escolha o seu perfil.</p>
+          <a href="/" class="btn btn-solid mt-10">Ir para a página inicial</a>
+        </div>
+        <nav aria-label="Soluções" class="grid-dots px-6 py-10 sm:px-10">
+          <p class="label mb-4">soluções</p>
+          <ul class="space-y-1">
+            {
+              segments.map((segment) => (
+                <li>
+                  <a href={`/${segment.slug}`} class="font-mono text-bone hover:text-paper">
+                    /{segment.slug}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+      </div>
+    </Row>
+  </div>
+</BaseLayout>

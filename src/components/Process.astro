@@ -1,0 +1,35 @@
+---
+const steps = [
+  {
+    title: 'Conversa',
+    description: 'Você explica o problema do seu jeito. A gente faz as perguntas e entende como o trabalho acontece hoje.',
+  },
+  {
+    title: 'Proposta',
+    description: 'Escopo, prazo e valor por escrito antes de qualquer linha de código.',
+  },
+  {
+    title: 'Construção',
+    description: 'Entregas curtas que você testa durante o projeto, para ajustar o rumo cedo.',
+  },
+  {
+    title: 'Entrega e suporte',
+    description: 'Sistema publicado, equipe orientada a usar e acompanhamento depois da entrega.',
+  },
+] as const;
+---
+
+<ol class="cells sm:grid-cols-2 lg:grid-cols-4">
+  {
+    steps.map((step, index) => (
+      <li class="flex flex-col px-6 py-10 sm:px-8">
+        <span class="font-mono text-sm text-ash">
+          {String(index + 1).padStart(2, '0')}
+          <span aria-hidden="true" class="text-edge"> / {String(steps.length).padStart(2, '0')}</span>
+        </span>
+        <h3 class="type-heading mt-12 text-paper">{step.title}</h3>
+        <p class="mt-3 text-ash">{step.description}</p>
+      </li>
+    ))
+  }
+</ol>

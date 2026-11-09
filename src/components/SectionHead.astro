@@ -1,0 +1,29 @@
+---
+interface Props {
+  /** Two-digit section index, e.g. "01". */
+  index: string;
+  label: string;
+  title: string;
+  titleId: string;
+  lede?: string;
+  as?: 'h1' | 'h2';
+}
+
+const { index, label, title, titleId, lede, as: Heading = 'h2' } = Astro.props;
+const hasAction = Astro.slots.has('action');
+---
+
+<div class="border-b border-line">
+  <p class="label flex items-center gap-3 border-b border-line px-6 py-3 sm:px-10">
+    <span class="text-paper">{index}</span>
+    <span aria-hidden="true" class="h-px w-6 bg-edge"></span>
+    <span>{label}</span>
+  </p>
+  <div class="flex flex-col gap-6 px-6 py-10 sm:px-10 sm:py-14 md:flex-row md:items-end md:justify-between">
+    <div class="max-w-3xl">
+      <Heading id={titleId} class="type-title text-paper">{title}</Heading>
+      {lede && <p class="type-lede mt-5 max-w-2xl">{lede}</p>}
+    </div>
+    {hasAction && <div class="shrink-0"><slot name="action" /></div>}
+  </div>
+</div>

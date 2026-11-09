@@ -1,0 +1,124 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import SegmentGrid from '@/components/SegmentGrid.astro';
+import CaseGrid from '@/components/CaseGrid.astro';
+import Process from '@/components/Process.astro';
+import ContactSection from '@/components/ContactSection.astro';
+import ProblemDiff, { type DiffItem } from '@/components/react/ProblemDiff';
+import { segments } from '@/data/segments';
+import { cases } from '@/data/cases';
+import { site } from '@/data/site';
+import { primaryContactHref, primaryIsExternal } from '@/lib/contact';
+
+const diffItems: DiffItem[] = segments.map((segment) => ({
+  id: segment.slug,
+  label: segment.persona,
+  problem: segment.examples[0].problem,
+  outputs: segment.examples[0].outputs,
+  link: { href: `/${segment.slug}`, label: `Ver soluções para ${segment.label.toLowerCase()}` },
+}));
+
+const stack = [...new Set(cases.flatMap((item) => item.stack))];
+const cta = primaryContactHref('Olá! Vim pelo site da BKode e quero contar um problema.');
+const external = primaryIsExternal ? { target: '_blank', rel: 'noopener' } : {};
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: site.name,
+  url: Astro.site?.href,
+  email: site.email,
+  description: site.description,
+  areaServed: 'BR',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: site.city,
+    addressRegion: site.region,
+    addressCountry: site.country,
+  },
+  sameAs: [site.githubUrl],
+};
+---
+
+<BaseLayout structuredData={organization}>
+  <div class="frame">
+    <Row aria-labelledby="hero-titulo" crosses={false}>
+      <div class="cells lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div class="flex flex-col px-6 pt-12 pb-14 sm:px-10 sm:pt-16 sm:pb-20 lg:pb-24">
+          <p class="label flex items-center gap-2">
+            <span aria-hidden="true" class="inline-block size-1.5 rounded-full bg-paper"></span>
+            software house · {site.city}, {site.region}
+          </p>
+          <h1 id="hero-titulo" class="type-display construct -mx-6 mt-10 px-6 text-paper sm:-mx-10 sm:px-10">
+            <span class="block">Você descreve o problema.</span>
+            <span class="block text-ash">A gente escreve o sistema.</span>
+          </h1>
+          <p class="type-lede mt-8 max-w-xl">
+            Sistemas, automações com IA e sites para empresas, microempreendedores, profissionais e estudantes. Você fala
+            direto com quem constrói.
+          </p>
+          <div class="mt-10 flex flex-wrap gap-3">
+            <a href={cta} class="btn btn-solid" {...external}>Contar meu problema</a>
+            <a href="/cases" class="btn btn-ghost">Ver cases</a>
+          </div>
+        </div>
+        <div class="grid-dots flex items-center px-4 py-8 sm:px-8 sm:py-12">
+          <div class="w-full">
+            <ProblemDiff client:idle items={diffItems} caption="eu sou" ariaLabel="Escolha seu perfil" />
+          </div>
+        </div>
+      </div>
+    </Row>
+
+    <Row as="div" aria-label="Stack em produção">
+      <div class="flex flex-col gap-4 px-6 py-5 sm:flex-row sm:items-center sm:gap-8 sm:px-10">
+        <p class="label shrink-0">stack em produção</p>
+        <ul class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-sm text-bone">
+          {stack.map((tech) => <li>{tech}</li>)}
+        </ul>
+      </div>
+    </Row>
+
+    <Row id="solucoes" aria-labelledby="solucoes-titulo">
+      <SectionHead
+        index="01"
+        label="soluções"
+        title="Uma solução para cada tipo de rotina."
+        titleId="solucoes-titulo"
+        lede="Empresa com equipe, negócio de uma pessoa só, profissional autônomo ou estudante: o problema muda, e o sistema também."
+      />
+      <SegmentGrid />
+    </Row>
+
+    <Row id="cases" aria-labelledby="cases-titulo">
+      <SectionHead
+        index="02"
+        label="cases"
+        title="Projetos que já construímos."
+        titleId="cases-titulo"
+        lede="Cada case mostra o problema, a solução e as decisões técnicas por trás."
+      >
+        <a slot="action" href="/cases" class="btn btn-ghost">Todos os cases</a>
+      </SectionHead>
+      <CaseGrid
+        items={cases}
+        cta={{ href: '/#contato', title: 'O próximo case pode ser o seu sistema.', label: 'Contar meu problema' }}
+      />
+    </Row>
+
+    <Row id="processo" aria-labelledby="processo-titulo">
+      <SectionHead
+        index="03"
+        label="processo"
+        title="Como trabalhamos."
+        titleId="processo-titulo"
+        lede="Do primeiro contato ao sistema no ar, você sabe o que está sendo feito e quando."
+      />
+      <Process />
+    </Row>
+
+    <ContactSection />
+  </div>
+</BaseLayout>

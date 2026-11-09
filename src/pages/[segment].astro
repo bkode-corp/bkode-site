@@ -1,0 +1,204 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import SectionHead from '@/components/SectionHead.astro';
+import CaseGrid from '@/components/CaseGrid.astro';
+import Process from '@/components/Process.astro';
+import ContactSection from '@/components/ContactSection.astro';
+import Arrow from '@/components/Arrow.astro';
+import ProblemDiff, { type DiffItem } from '@/components/react/ProblemDiff';
+import { segments } from '@/data/segments';
+import { getCases } from '@/data/cases';
+import { primaryContactHref, primaryIsExternal, whatsappHref, whatsappNumber } from '@/lib/contact';
+
+export const getStaticPaths = (() =>
+  segments.map((segment) => ({ params: { segment: segment.slug }, props: { segment } }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { segment } = Astro.props as Props;
+const name = segment.label.toLowerCase();
+
+const diffItems: DiffItem[] = segment.examples.map((example) => ({
+  id: `${segment.slug}-${example.tag}`,
+  label: example.tag,
+  problem: example.problem,
+  outputs: example.outputs,
+}));
+
+const relatedCases = getCases(segment.caseSlugs);
+const packages = segment.packages ?? [];
+const otherSegments = segments.filter((item) => item.slug !== segment.slug);
+
+const cta = primaryContactHref(`Olá! Vim pela página de ${name} da BKode e quero conversar sobre um projeto.`);
+const external = primaryIsExternal ? { target: '_blank', rel: 'noopener' } : {};
+const packageHref = (pkg: string) =>
+  whatsappHref(`Olá! Vim pelo site da BKode e quero saber mais sobre o pacote "${pkg}".`) ?? '#contato';
+
+// Section numbers follow what is actually rendered on the page.
+let n = 0;
+const next = () => String(++n).padStart(2, '0');
+const idx = {
+  offers: next(),
+  packages: packages.length > 0 ? next() : '',
+  cases: relatedCases.length > 0 ? next() : '',
+  process: next(),
+  contact: next(),
+};
+
+const service = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: segment.seo.title,
+  description: segment.seo.description,
+  provider: { '@type': 'ProfessionalService', name: 'BKode' },
+  areaServed: 'BR',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: `Soluções para ${name}`,
+    itemListElement: segment.offers.map((offer) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: offer.title, description: offer.description },
+    })),
+  },
+};
+---
+
+<BaseLayout
+  title={segment.seo.title}
+  description={segment.seo.description}
+  ogImage={`/og/${segment.slug}.png`}
+  structuredData={service}
+>
+  <div class="frame">
+    <Row aria-labelledby="segmento-titulo" crosses={false}>
+      <div class="cells lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div class="flex flex-col px-6 pt-12 pb-14 sm:px-10 sm:pt-16 sm:pb-20">
+          <nav aria-label="Você está em" class="label">
+            <a href="/#solucoes" class="hover:text-paper">soluções</a>
+            <span aria-hidden="true" class="mx-2 text-edge">/</span>
+            <span class="text-paper" aria-current="page">{segment.slug}</span>
+          </nav>
+          <h1 id="segmento-titulo" class="type-display type-display-sm construct -mx-6 mt-10 px-6 text-paper sm:-mx-10 sm:px-10">
+            {segment.headline}
+          </h1>
+          <p class="type-lede mt-8 max-w-xl">{segment.lede}</p>
+          <div class="mt-10 flex flex-wrap gap-3">
+            <a href={cta} class="btn btn-solid" {...external}>
+              {whatsappNumber ? 'Conversar no WhatsApp' : 'Contar meu problema'}
+            </a>
+            <a href={packages.length > 0 ? '#pacotes' : '#ofertas'} class="btn btn-ghost">
+              {packages.length > 0 ? 'Ver pacotes' : 'Ver o que fazemos'}
+            </a>
+          </div>
+        </div>
+        <div class="grid-dots flex items-center px-4 py-8 sm:px-8 sm:py-12">
+          <div class="w-full">
+            <ProblemDiff client:idle items={diffItems} ariaLabel={`Exemplos para ${name}`} filename={`${segment.slug}.diff`} />
+          </div>
+        </div>
+      </div>
+    </Row>
+
+    <Row id="ofertas" aria-labelledby="ofertas-titulo">
+      <SectionHead
+        index={idx.offers}
+        label="o que fazemos"
+        title={`O que a BKode faz para ${name}.`}
+        titleId="ofertas-titulo"
+        lede={segment.audience}
+      />
+      <dl class="cells md:grid-cols-2">
+        {
+          segment.offers.map((offer, i) => (
+            <div class:list={['px-6 py-10 sm:px-10', segment.offers.length % 2 === 1 && i === segment.offers.length - 1 && 'md:col-span-2']}>
+              <p class="font-mono text-sm text-ash">{String(i + 1).padStart(2, '0')}</p>
+              <dt class="type-heading mt-8 text-paper">{offer.title}</dt>
+              <dd class="mt-3 max-w-md text-ash">{offer.description}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </Row>
+
+    {
+      packages.length > 0 && (
+        <Row id="pacotes" aria-labelledby="pacotes-titulo">
+          <SectionHead
+            index={idx.packages}
+            label="pacotes"
+            title="Pacotes com escopo fechado."
+            titleId="pacotes-titulo"
+            lede="Você sabe o que recebe antes de começar. Se o seu caso não couber em nenhum, a gente monta sob medida."
+          />
+          <ul class="cells lg:grid-cols-3">
+            {packages.map((pkg) => (
+              <li class="flex flex-col px-6 py-10 sm:px-8">
+                <h3 class="type-heading text-paper">{pkg.name}</h3>
+                <p class="mt-3 text-ash">{pkg.summary}</p>
+                <ul class="mt-8 space-y-2.5 border-t border-line pt-6">
+                  {pkg.includes.map((item) => (
+                    <li class="grid grid-cols-[1.25rem_minmax(0,1fr)] text-bone">
+                      <span aria-hidden="true" class="font-mono text-ash">+</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div class="mt-auto pt-10">
+                  <p class="font-mono text-sm text-paper">{pkg.price ?? 'Valor fechado antes de começar'}</p>
+                  <a href={packageHref(pkg.name)} class="btn btn-ghost mt-4 w-full" {...(whatsappNumber ? { target: '_blank', rel: 'noopener' } : {})}>
+                    Quero este pacote
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </Row>
+      )
+    }
+
+    {
+      relatedCases.length > 0 && (
+        <Row id="cases" aria-labelledby="cases-titulo">
+          <SectionHead index={idx.cases} label="cases" title={`Projetos para ${name}.`} titleId="cases-titulo">
+            <a slot="action" href="/cases" class="btn btn-ghost">
+              Todos os cases
+            </a>
+          </SectionHead>
+          <CaseGrid
+            items={relatedCases}
+            cta={{ href: '#contato', title: 'O próximo pode ser o seu.', label: 'Contar meu problema' }}
+          />
+        </Row>
+      )
+    }
+
+    <Row aria-labelledby="processo-titulo">
+      <SectionHead index={idx.process} label="processo" title="Como trabalhamos." titleId="processo-titulo" />
+      <Process />
+    </Row>
+
+    <ContactSection index={idx.contact} defaultSegment={segment.leadValue} />
+
+    <Row as="div">
+      <nav aria-label="Outras soluções">
+        <p class="label border-b border-line px-6 py-3 sm:px-10">também atendemos</p>
+        <ul class="cells sm:grid-cols-3">
+          {
+            otherSegments.map((item) => (
+              <li>
+                <a href={`/${item.slug}`} class="group flex items-center justify-between gap-4 px-6 py-6 transition-colors hover:bg-coal/60 sm:px-8">
+                  <span class="type-heading text-paper">{item.label}</span>
+                  <span class="link-arrow">
+                    <Arrow />
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </Row>
+  </div>
+</BaseLayout>

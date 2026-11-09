@@ -1,0 +1,136 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Row from '@/components/Row.astro';
+import ContactSection from '@/components/ContactSection.astro';
+import Arrow from '@/components/Arrow.astro';
+import { cases } from '@/data/cases';
+import { segments } from '@/data/segments';
+
+export const getStaticPaths = (() =>
+  cases.map((item, i) => ({
+    params: { slug: item.slug },
+    props: { item, next: cases[(i + 1) % cases.length]! },
+  }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { item, next } = Astro.props as Props;
+const itemSegments = segments.filter((s) => (item.segments as readonly string[]).includes(s.slug));
+
+const blocks = [
+  { id: 'problema', label: 'problema', body: item.problem },
+  { id: 'solucao', label: 'solução', body: item.solution },
+] as const;
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'CreativeWork',
+  name: item.name,
+  about: item.kind,
+  description: item.summary,
+  creator: { '@type': 'Organization', name: 'BKode' },
+  keywords: item.stack.join(', '),
+};
+---
+
+<BaseLayout title={`${item.name} · ${item.kind}`} description={item.summary} ogImage="/og/cases.png" structuredData={article}>
+  <div class="frame">
+    <Row as="article" aria-labelledby="case-titulo" crosses={false}>
+      <div class="cells md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div class="px-6 pt-12 pb-14 sm:px-10 sm:pt-16 sm:pb-20">
+          <nav aria-label="Você está em" class="label">
+            <a href="/cases" class="hover:text-paper">cases</a>
+            <span aria-hidden="true" class="mx-2 text-edge">/</span>
+            <span class="text-paper" aria-current="page">{item.slug}</span>
+          </nav>
+          <p class="label mt-10 text-bone">{item.kind}</p>
+          <h1 id="case-titulo" class="type-display type-display-sm construct -mx-6 mt-3 px-6 text-paper sm:-mx-10 sm:px-10">
+            {item.name}
+          </h1>
+          <p class="type-lede mt-8 max-w-xl">{item.summary}</p>
+        </div>
+        <dl class="grid-dots flex flex-col justify-end gap-7 px-6 py-10 sm:px-10">
+          {
+            item.status && (
+              <div>
+                <dt class="label">status</dt>
+                <dd class="mt-2 text-paper">{item.status}</dd>
+              </div>
+            )
+          }
+          <div>
+            <dt class="label">para</dt>
+            <dd class="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+              {
+                itemSegments.map((s) => (
+                  <a href={`/${s.slug}`} class="text-paper underline decoration-edge underline-offset-4 hover:decoration-paper">
+                    {s.label}
+                  </a>
+                ))
+              }
+            </dd>
+          </div>
+          <div>
+            <dt class="label">stack</dt>
+            <dd class="mt-2">
+              <ul class="flex flex-wrap gap-1.5">
+                {item.stack.map((tech) => <li class="chip">{tech}</li>)}
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </Row>
+
+    {
+      blocks.map((block, i) => (
+        <Row aria-labelledby={`${block.id}-titulo`}>
+          <div class="cells md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+            <h2 id={`${block.id}-titulo`} class="label flex gap-3 px-6 py-6 sm:px-10 md:py-12">
+              <span class="text-paper">{String(i + 1).padStart(2, '0')}</span>
+              {block.label}
+            </h2>
+            <p class="px-6 pb-10 text-xl leading-relaxed text-bone sm:px-10 md:py-12 md:text-2xl md:leading-snug md:tracking-tight">
+              {block.body}
+            </p>
+          </div>
+        </Row>
+      ))
+    }
+
+    <Row aria-labelledby="decisoes-titulo">
+      <div class="cells md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+        <h2 id="decisoes-titulo" class="label flex gap-3 px-6 py-6 sm:px-10 md:py-12">
+          <span class="text-paper">03</span>
+          decisões técnicas
+        </h2>
+        <ol class="divide-y divide-line">
+          {
+            item.decisions.map((decision, i) => (
+              <li class="grid grid-cols-[2.5rem_minmax(0,1fr)] px-6 py-8 sm:px-10">
+                <span class="font-mono text-sm text-ash">{String(i + 1).padStart(2, '0')}</span>
+                <span class="text-lg text-bone">{decision}</span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </Row>
+
+    <Row as="div">
+      <a href={`/cases/${next.slug}`} class="group flex flex-col gap-3 px-6 py-10 transition-colors hover:bg-coal/60 sm:flex-row sm:items-end sm:justify-between sm:px-10">
+        <span>
+          <span class="label block">próximo case</span>
+          <span class="type-title mt-3 block text-paper">{next.name}</span>
+        </span>
+        <span class="link-arrow">
+          {next.kind}
+          <Arrow />
+        </span>
+      </a>
+    </Row>
+
+    <ContactSection index="04" title="Tem um problema parecido?" lede="Conte como está hoje. A gente responde com perguntas, um caminho e um prazo." />
+  </div>
+</BaseLayout>
