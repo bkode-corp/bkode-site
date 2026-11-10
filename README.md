@@ -16,11 +16,11 @@ npm run build    # astro check + build (.vercel/output)
 | --- | --- |
 | Textos por público, ofertas, pacotes e preços | `src/data/segments.ts` |
 | Cases | `src/data/cases.ts` |
-| Nome, e-mail, cidade, menu | `src/data/site.ts` |
+| Nome, e-mail, WhatsApp, cidade, menu | `src/data/site.ts` |
 | Geometria do logo (fonte única para site, downloads e imagens) | `src/lib/brand.ts` |
 | Tokens visuais (cores Zinc, grid, linhas de construção) | `src/styles/global.css` |
 
-Preço de pacote: preencha `price` em `segments.ts` (ex.: `price: 'a partir de R$ 900'`). Sem ele, o card mostra "Valor fechado antes de começar".
+Preço de pacote: `price` (implantação), `monthly` e `monthlyCovers` em `segments.ts`. Sem `price`, o card mostra "Valor fechado antes de começar".
 
 ## Rotas
 
@@ -34,7 +34,7 @@ Preço de pacote: preencha `price` em `segments.ts` (ex.: `price: 'a partir de R
 
 Veja `.env.example`. Todas são opcionais:
 
-- `PUBLIC_WHATSAPP_NUMBER`: liga os botões de WhatsApp. Sem ele, os CTAs levam para a seção de contato.
+- `PUBLIC_WHATSAPP_NUMBER`: troca o WhatsApp padrão de `site.ts`.
 - `PUBLIC_CONTACT_EMAIL`: troca o e-mail padrão (`bkode.corp@gmail.com`).
 - `SUPABASE_URL` + `SUPABASE_PUBLISHABLE_KEY`: o formulário só aparece quando os dois existem. Antes disso, a seção de contato mostra WhatsApp e e-mail.
 - `SITE_URL`: origem canônica quando o domínio próprio existir.

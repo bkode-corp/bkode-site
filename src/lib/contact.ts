@@ -5,7 +5,7 @@ const DIGITS_ONLY = /\D/g;
 
 /** Normalized E.164 digits (e.g. 5591999999999) or null when not configured. */
 export const whatsappNumber: string | null = (() => {
-  const digits = PUBLIC_WHATSAPP_NUMBER?.replace(DIGITS_ONLY, '') ?? '';
+  const digits = (PUBLIC_WHATSAPP_NUMBER?.trim() || site.whatsapp).replace(DIGITS_ONLY, '');
   return digits.length >= 12 && digits.length <= 15 ? digits : null;
 })();
 

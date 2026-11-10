@@ -9,6 +9,8 @@ export const site = {
   country: 'BR',
   /** Public business inbox. PUBLIC_CONTACT_EMAIL overrides it (e.g. contato@<domínio> once the domain exists). */
   email: 'bkode.corp@gmail.com',
+  /** Business WhatsApp in E.164 digits. PUBLIC_WHATSAPP_NUMBER overrides it. */
+  whatsapp: '5591992531885',
   githubUrl: 'https://github.com/bkode-corp',
   foundedYear: 2026,
 } as const;

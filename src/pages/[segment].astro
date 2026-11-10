@@ -130,7 +130,7 @@ const service = {
             label="pacotes"
             title="Pacotes com escopo fechado."
             titleId="pacotes-titulo"
-            lede="Você sabe o que recebe antes de começar. Se o seu caso não couber em nenhum, a gente monta sob medida."
+            lede="Você sabe o que recebe e quanto paga antes de começar. A implantação é paga metade no início e metade na entrega, e a mensalidade só começa com o sistema no ar."
           />
           <ul class="cells lg:grid-cols-3">
             {packages.map((pkg) => (
@@ -146,7 +146,25 @@ const service = {
                   ))}
                 </ul>
                 <div class="mt-auto pt-10">
-                  <p class="font-mono text-sm text-paper">{pkg.price ?? 'Valor fechado antes de começar'}</p>
+                  {pkg.price ? (
+                    <>
+                      <dl class="border-t border-line pt-6">
+                        <div class="flex items-baseline justify-between gap-4">
+                          <dt class="label">implantação</dt>
+                          <dd class="text-3xl font-semibold tracking-tight text-paper">{pkg.price}</dd>
+                        </div>
+                        {pkg.monthly && (
+                          <div class="mt-2 flex items-baseline justify-between gap-4">
+                            <dt class="label">mensalidade</dt>
+                            <dd class="font-mono text-paper">{pkg.monthly}</dd>
+                          </div>
+                        )}
+                      </dl>
+                      {pkg.monthlyCovers && <p class="mt-3 text-sm text-ash">{pkg.monthlyCovers}</p>}
+                    </>
+                  ) : (
+                    <p class="font-mono text-sm text-paper">Valor fechado antes de começar</p>
+                  )}
                   <a href={packageHref(pkg.name)} class="btn btn-ghost mt-4 w-full" {...(whatsappNumber ? { target: '_blank', rel: 'noopener' } : {})}>
                     Quero este pacote
                   </a>

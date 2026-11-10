@@ -14,13 +14,17 @@ export type Example = {
 
 export type Offer = { title: string; description: string };
 
-/** Productized offer with a fixed scope. `price` stays unset until the value is decided. */
+/** Productized offer with a fixed scope: one-off setup plus a monthly fee. */
 export type Package = {
   name: string;
   summary: string;
   includes: readonly string[];
-  /** Display string, e.g. "a partir de R$ 900". */
+  /** One-off setup, display string (e.g. "R$ 1.200"). */
   price?: string;
+  /** Recurring fee, display string (e.g. "R$ 39/mês"). */
+  monthly?: string;
+  /** What the monthly fee pays for. */
+  monthlyCovers?: string;
 };
 
 export type Segment = {
@@ -153,6 +157,9 @@ const segmentData = [
           'Configuração para aparecer nas buscas do Google',
           'Publicação no seu domínio',
         ],
+        price: 'R$ 1.200',
+        monthly: 'R$ 39/mês',
+        monthlyCovers: 'Hospedagem, domínio e ajustes de texto e fotos.',
       },
       {
         name: 'Agenda online',
@@ -163,6 +170,9 @@ const segmentData = [
           'Sinal ou pagamento no momento da marcação',
           'Painel para você ver e remarcar a agenda',
         ],
+        price: 'R$ 900',
+        monthly: 'R$ 79/mês',
+        monthlyCovers: 'Servidor, banco de dados, backups e suporte.',
       },
       {
         name: 'Controle de vendas',
@@ -173,6 +183,9 @@ const segmentData = [
           'Estoque com aviso de reposição',
           'Fechamento do mês em PDF',
         ],
+        price: 'R$ 900',
+        monthly: 'R$ 79/mês',
+        monthlyCovers: 'Servidor, banco de dados, backups e suporte.',
       },
     ],
     seo: {

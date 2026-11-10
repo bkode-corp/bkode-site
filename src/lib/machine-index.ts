@@ -34,7 +34,8 @@ export const buildLlmsTxt = (
     lines.push(`### ${segment.label}`, '', `${segment.headline} ${segment.lede}`, '', `Página: ${url(`/${segment.slug}`)}`, '');
     for (const offer of segment.offers) lines.push(`- ${offer.title}: ${offer.description}`);
     for (const pkg of segment.packages ?? []) {
-      lines.push(`- Pacote "${pkg.name}" (${pkg.price ?? 'valor sob consulta'}): ${pkg.includes.join('; ')}.`);
+      const cost = pkg.price ? [pkg.price, pkg.monthly].filter(Boolean).join(' + ') : 'valor sob consulta';
+      lines.push(`- Pacote "${pkg.name}" (${cost}): ${pkg.includes.join('; ')}.`);
     }
     lines.push('');
   }
