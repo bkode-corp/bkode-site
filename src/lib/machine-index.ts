@@ -6,7 +6,10 @@ import { cases } from '@/data/cases';
  * Plain-text index of the whole site for AI agents and crawlers (llms.txt convention).
  * Built from the same data as the pages, so it never drifts from what visitors read.
  */
-export const buildLlmsTxt = (origin: string, contact: { email: string; whatsapp: string | null }): string => {
+export const buildLlmsTxt = (
+  origin: string,
+  contact: { email: string; whatsapp: string | null; formEnabled: boolean },
+): string => {
   const url = (path: string) => new URL(path, origin).href;
   const lines: string[] = [
     `# ${site.name}`,
@@ -20,7 +23,7 @@ export const buildLlmsTxt = (origin: string, contact: { email: string; whatsapp:
     '',
     `- E-mail: ${contact.email}`,
     ...(contact.whatsapp ? [`- WhatsApp: https://wa.me/${contact.whatsapp}`] : []),
-    `- Formulário: ${url('/#contato')}`,
+    ...(contact.formEnabled ? [`- Formulário: ${url('/#contato')}`] : []),
     `- GitHub: ${site.githubUrl}`,
     '',
     '## Soluções por público',
